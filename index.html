@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#fcfbf7">
+<title>for hannah</title>
+<meta name="description" content="some flowers, sent from madrid">
+<meta property="og:title" content="for hannah">
+<meta property="og:description" content="some flowers, sent from madrid">
+<meta property="og:image" content="https://linxpert.github.io/for-hannah/preview.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://linxpert.github.io/for-hannah/">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌼</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Ms+Madi&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #fcfbf7;
+    --graphite: #3d3d3d;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    background: var(--paper);
+    color: var(--graphite);
+    font-family: "Ms Madi", "Segoe Script", "Bradley Hand", cursive;
+    overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none; user-select: none;
+  }
+  .grain { position: fixed; inset: 0; pointer-events: none; opacity: .6; }
+  #fx { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+
+  /* pencil-grey handwriting */
+  .pencil {
+    color: var(--graphite);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  main {
+    position: relative;
+    height: 100vh; height: 100dvh;
+    display: flex; flex-direction: column; align-items: center;
+    padding: max(16px, env(safe-area-inset-top)) 16px max(12px, env(safe-area-inset-bottom));
+  }
+  .top {
+    position: relative; flex: none;
+    width: min(100%, 600px);
+    height: clamp(112px, 18vh, 170px);
+  }
+  .intro, .msg {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    margin: 0 auto; text-align: center; font-weight: 400;
+  }
+  .intro {
+    font-size: clamp(25px, 7vw, 33px); line-height: 1.15;
+    max-width: 15em; text-wrap: balance;
+    opacity: 0; transform: translateY(6px);
+    transition: opacity 1.4s ease, transform 1.4s ease;
+  }
+  .ready .intro { opacity: 1; transform: none; }
+  .blooming .intro { opacity: 0; transform: translateY(-8px); transition-duration: .8s; }
+
+  .msg { font-size: clamp(42px, 11.5vw, 70px); line-height: 1.02; text-wrap: balance; }
+  .w {
+    display: inline-block;
+    padding: 0 .12em .18em;
+    -webkit-clip-path: inset(-40% 105% -40% -10%); clip-path: inset(-40% 105% -40% -10%);
+    transition: -webkit-clip-path .75s ease-in-out, clip-path .75s ease-in-out;
+  }
+  .msg.show .w { -webkit-clip-path: inset(-40% -10% -40% -10%); clip-path: inset(-40% -10% -40% -10%); }
+
+  .stage { position: relative; flex: 1 1 auto; min-height: 0; width: 100%; }
+  #bouquet {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    overflow: visible; transition: opacity .7s ease;
+  }
+  #bouquet.fade { opacity: 0; }
+  #budHit { cursor: pointer; }
+
+  .bottom {
+    position: relative; flex: none;
+    width: 100%; height: clamp(92px, 13vh, 124px);
+    display: flex; align-items: center; justify-content: center;
+  }
+  button {
+    font: inherit; cursor: pointer; background: none; border: 0; color: var(--graphite);
+    touch-action: manipulation; -webkit-appearance: none; appearance: none;
+  }
+  .tap {
+    position: absolute;
+    padding: 14px 40px; min-height: 56px;
+    font-size: 34px; line-height: 1;
+    opacity: 0; pointer-events: none;
+    transition: opacity 1s ease .3s;
+  }
+  .tap svg { position: absolute; inset: -4px -6px; width: calc(100% + 12px); height: calc(100% + 8px); overflow: visible; pointer-events: none; }
+  .tap svg path { fill: none; stroke: var(--graphite); stroke-width: 1.4; stroke-linecap: round; stroke-dasharray: 400; stroke-dashoffset: 400; opacity: .75; }
+  .ready .tap { opacity: 1; pointer-events: auto; }
+  .ready .tap svg path { transition: stroke-dashoffset 1.2s ease-in-out 1.3s; stroke-dashoffset: 0; }
+  .blooming .tap { opacity: 0; pointer-events: none; transition-delay: 0s; transition-duration: .5s; }
+  .tap:active { transform: scale(.96); }
+
+  .after {
+    position: absolute; text-align: center;
+    opacity: 0; pointer-events: none;
+    transition: opacity 1.4s ease;
+  }
+  .done .after { opacity: 1; pointer-events: auto; }
+  .meta { margin: 0 0 2px; font-size: clamp(21px, 5.6vw, 25px); line-height: 1.15; }
+  .meta span { white-space: nowrap; }
+  .replay { font-size: 24px; padding: 6px 14px; min-height: 40px; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 5px; text-decoration-color: rgba(91,91,91,.45); }
+  .tap:focus-visible, .replay:focus-visible { outline: 1px dashed var(--graphite); outline-offset: 4px; }
+</style>
+</head>
+<body>
+<div class="grain" id="grain"></div>
+<canvas id="fx"></canvas>
+
+<main>
+  <header class="top">
+    <p class="intro pencil">trying to figure out how to send these across the atlantic, so i made u some in the meantime.</p>
+    <h1 class="msg" id="msg" aria-live="polite"></h1>
+  </header>
+
+  <div class="stage">
+    <svg id="bouquet" viewBox="14 84 372 476" role="img" aria-label="a hand-drawn bouquet of wildflowers"></svg>
+  </div>
+
+  <footer class="bottom">
+    <button class="tap" id="tap" type="button"><span class="pencil">tap me</span>
+      <svg viewBox="0 0 200 70" preserveAspectRatio="none" aria-hidden="true"><path d="M150,10 C110,-2 30,2 12,26 C-2,46 40,64 104,62 C170,60 200,44 190,24 C182,8 140,4 112,6"/></svg>
+    </button>
+    <div class="after">
+      <p class="meta pencil" id="meta"></p>
+      <button class="replay" id="replay" type="button"><span class="pencil">draw them again</span></button>
+    </div>
+  </footer>
+</main>
+
+<script>
+/* ---------- things you can change ---------- */
+const MESSAGE = "congratulations on graduating!";
+const MILES = "5,594", KM = "9,002";
+/* ------------------------------------------- */
+
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const SPEED = reduce ? 2.2 : 1;
+const NS = "http://www.w3.org/2000/svg";
+const svg = document.getElementById("bouquet");
+const body = document.body;
+
+// seeded randomness so the bouquet looks the same every time
+let seed = 7031;
+function rnd() { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }
+const jit = a => (rnd() * 2 - 1) * a;
+
+function S(tag, attrs, parent) {
+  const e = document.createElementNS(NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (parent) parent.appendChild(e);
+  return e;
+}
+
+/* ---------- ink + colours (sampled from the reference) ---------- */
+const INK = "#1f1b1b", LINE = 2.1, FINE = 1.1;
+const C = {
+  poppy: ["#eeaebf", "#f4c2ce", "#f9d8e0"],
+  cone: "#fbf0da", coneMid: "#e8d2a6",
+  daisy: "#d8ccf3", daisyMid: "#f7ebcf",
+  geranium: "#f0afc0", geraniumMid: "#fdf6ec",
+  fox: "#c4b4ec", foxMark: "#9483c8",
+  berry: "#e2a2b5",
+  lav: "#cfc3f0",
+  leafDark: "#8ea584", leafPale: "#c4d1b7",
+  butter: "#f6e5c2",
+  blossom: "#f9dde3", blossomMid: "#e6b2c0",
+  calla: "#e8d8f3", callaIn: "#d8c4ec",
+};
+// filled shape with an ink outline
+function ink(d, fill, parent, w = LINE) {
+  return S("path", { d, fill, stroke: INK, "stroke-width": w, "stroke-linejoin": "round", "stroke-linecap": "round" }, parent);
+}
+// ink detail line, no fill
+function line(d, parent, w = FINE, color = INK) {
+  return S("path", { d, fill: "none", stroke: color, "stroke-width": w, "stroke-linecap": "round" }, parent);
+}
+
+/* ---------- shapes (all point "up" from 0,0) ---------- */
+const fan = (w, l) => `M0,0 C${-w*.25},${-l*.15} ${-w*1.05},${-l*.42} ${-w*.92},${-l*.86} C${-w*.62},${-l*1.08} ${w*.62},${-l*1.08} ${w*.92},${-l*.86} C${w*1.05},${-l*.42} ${w*.25},${-l*.15} 0,0Z`;
+const strap = (w, l) => `M0,0 C${-w},${-l*.15} ${-w*1.1},${-l*.8} ${-w*.55},${-l*.98} Q${-w*.2},${-l*.9} 0,${-l*1.02} Q${w*.2},${-l*.9} ${w*.55},${-l*.98} C${w*1.1},${-l*.8} ${w},${-l*.15} 0,0Z`;
+const thin = (w, l) => `M0,0 C${-w},${-l*.25} ${-w},${-l*.85} 0,${-l} C${w},${-l*.85} ${w},${-l*.25} 0,0Z`;
+const round5 = (w, l) => `M0,0 C${-w*.9},${-l*.25} ${-w*1.2},${-l*.85} ${-w*.45},${-l*.98} C${-w*.15},${-l*1.04} 0,${-l*.9} 0,${-l*.84} C0,${-l*.9} ${w*.15},${-l*1.04} ${w*.45},${-l*.98} C${w*1.2},${-l*.85} ${w*.9},${-l*.25} 0,0Z`;
+const leafShape = (w, l) => `M0,0 C${w},${-l*.25} ${w*.8},${-l*.75} 0,${-l} C${-w*.8},${-l*.75} ${-w},${-l*.25} 0,0Z`;
+
+/* ---------- timeline ---------- */
+const T = [];
+const eio = t => t < .5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3) / 2;
+const eo = t => 1 - Math.pow(1 - t, 3);
+const back = t => { const c = 1.5; return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2); };
+const sine = t => -(Math.cos(Math.PI * t) - 1) / 2;
+function add(s, d, f, e = eio) { T.push({ s, d, f, e, last: -1 }); }
+const pop = el => e => el.setAttribute("transform", `scale(${Math.max(.001, e)})`);
+
+const OX = 200, OY = 552, TIE = 468;
+const flowers = [];
+const stemLayer = S("g", {}, svg), headLayer = S("g", {}, svg);
+
+function makeStem(parent, hx, hy, w = 1.7) {
+  const bx = OX + (hx - OX) * .05;
+  const tx = OX + (hx - OX) * .08;
+  const d = `M${bx},${OY} Q${OX + (bx - OX) * .4},508 ${tx},${TIE} Q${OX + (hx - OX) * .45},${hy + (TIE - hy) * .45} ${hx},${hy}`;
+  const p = S("path", { d, fill: "none", stroke: INK, "stroke-width": w, "stroke-linecap": "round" }, parent);
+  const L = p.getTotalLength();
+  p.style.strokeDasharray = L + " " + L;
+  return { p, L, set: e => { p.style.strokeDashoffset = L * (1 - e); } };
+}
+function pointOn(st, f) {
+  const d = Math.min(st.L, Math.max(0, st.L * f));
+  const a = st.p.getPointAtLength(Math.max(0, d - 1)), b = st.p.getPointAtLength(Math.min(st.L, d + 1)), c = st.p.getPointAtLength(d);
+  return { x: c.x, y: c.y, ang: Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI + 90 };
+}
+// a small thing (leaf, bell, berry) attached to a stem, popping in
+function attach(parent, st, f, rot, draw, t0, dur = .6) {
+  const p = pointOn(st, f);
+  const g = S("g", { transform: `translate(${p.x},${p.y}) rotate(${p.ang + rot})` }, parent);
+  const inner = S("g", {}, g);
+  draw(inner);
+  add(t0, dur, pop(inner), back);
+  return p;
+}
+// a side twig drawn in ink from a point on a stem
+function twig(parent, st, f, ang, len, t0, curve = 0) {
+  const p = pointOn(st, f);
+  const a = (p.ang - 90 + ang) * Math.PI / 180;
+  const ex = p.x + Math.cos(a) * len, ey = p.y + Math.sin(a) * len;
+  const mx = (p.x + ex) / 2 - Math.sin(a) * curve, my = (p.y + ey) / 2 + Math.cos(a) * curve;
+  const tw = S("path", { d: `M${p.x},${p.y} Q${mx},${my} ${ex},${ey}`, fill: "none", stroke: INK, "stroke-width": 1.2, "stroke-linecap": "round" }, parent);
+  const L = tw.getTotalLength(); tw.style.strokeDasharray = L + " " + L;
+  add(t0, .5, e => tw.style.strokeDashoffset = L * (1 - e), eo);
+  return { x: ex, y: ey, ang: Math.atan2(ey - p.y, ex - p.x) * 180 / Math.PI + 90 };
+}
+function leaf(g, fill = C.leafPale, w = 9, l = 28) {
+  ink(leafShape(w, l), fill, g, 1.5);
+  line(`M0,-2 Q1,${-l*.5} 0,${-l*.82}`, g, .9);
+}
+
+/* ---------- flower heads ---------- */
+function poppy(h, s, t0, main) {
+  const bk = S("g", {}, h), L = S("g", {}, h), R = S("g", {}, h), F = S("g", {}, h);
+  ink(fan(22 * s, 54 * s), C.poppy[0], bk);
+  ink(fan(20 * s, 44 * s), C.poppy[1], L); line(`M0,-4 Q${-4*s},${-22*s} ${-9*s},${-38*s}`, L);
+  ink(fan(20 * s, 44 * s), C.poppy[1], R); line(`M0,-4 Q${4*s},${-22*s} ${9*s},${-38*s}`, R);
+  ink(fan(17 * s, 36 * s), C.poppy[2], F);
+  line(`M0,-4 Q${-2*s},${-18*s} ${-5*s},${-30*s} M0,-4 Q${3*s},${-18*s} ${6*s},${-29*s}`, F);
+  ink(`M${-5*s},0 C${-5*s},${-5*s} ${5*s},${-5*s} ${5*s},0 C${3*s},${3*s} ${-3*s},${3*s} ${-5*s},0Z`, INK, h, 1);
+  add(t0, main ? 2.6 : 2, e => {
+    const sc = .5 + .5 * e;
+    bk.setAttribute("transform", `scale(${.55 + .45 * e})`);
+    L.setAttribute("transform", `rotate(${-5 - 19 * e}) scale(${sc})`);
+    R.setAttribute("transform", `rotate(${5 + 19 * e}) scale(${sc})`);
+    F.setAttribute("transform", `translate(0,${2 * e}) scale(${.48 + .52 * e})`);
+  }, sine);
+}
+function coneflower(h, s, t0) {
+  const petals = [-100, -68, -36, -4, 30, 64, 98];
+  petals.forEach((a, i) => {
+    const g = S("g", { transform: `rotate(${180 + a})` }, h);
+    const p = S("g", {}, g);
+    const l = (31 + jit(5)) * s;
+    ink(strap(6 * s, l), C.cone, p);
+    line(`M0,${-6*s} L0,${-l*.65}`, p, .9);
+    add(t0 + i * .06, 1.6, e => p.setAttribute("transform", `rotate(${-a * .55 * (1 - e)}) scale(${.15 + .85 * e})`), sine);
+  });
+  const cone = S("g", {}, h);
+  ink(`M${-15*s},${3*s} C${-17*s},${-12*s} ${-8*s},${-20*s} 0,${-20*s} C${8*s},${-20*s} ${17*s},${-12*s} ${15*s},${3*s} Q0,${-1*s} ${-15*s},${3*s}Z`, C.coneMid, cone);
+  line(`M${-9*s},${-9*s} Q${-5*s},${-15*s} ${1*s},${-16*s}`, cone, 1.3, "rgba(255,240,200,.8)");
+  add(t0 - .2, .9, e => cone.setAttribute("transform", `scale(${.45 + .55 * e})`), back);
+}
+function daisy(h, s, t0) {
+  const n = 22, off = rnd() * 16;
+  for (let i = 0; i < n; i++) {
+    const g = S("g", { transform: `rotate(${off + i * 360 / n + jit(4)})` }, h);
+    const p = S("g", {}, g);
+    const l = (28 + jit(3)) * s;
+    ink(thin(3.6 * s, l), C.daisy, p, 1.5);
+    line(`M0,${-l*.25} L0,${-l*.7}`, p, .7);
+    add(t0 + i * .025, 1.6, e => p.setAttribute("transform", `rotate(${24 * (1 - e)}) scale(${.12 + .88 * e})`), sine);
+  }
+  const ctr = S("g", {}, h);
+  ink(`M${-13*s},0 C${-13*s},${-11*s} ${13*s},${-11*s} ${13*s},0 C${13*s},${10*s} ${-13*s},${10*s} ${-13*s},0Z`, C.daisyMid, ctr);
+  line(`M${-7*s},${-3*s} Q${-3*s},${-7*s} ${3*s},${-6*s}`, ctr, 1.2, "rgba(255,248,215,.9)");
+  add(t0 + .6, .8, pop(ctr), back);
+}
+function geranium(h, s, t0) {
+  const off = rnd() * 72;
+  for (let i = 0; i < 5; i++) {
+    const g = S("g", { transform: `rotate(${off + i * 72 + jit(6)})` }, h);
+    const p = S("g", {}, g);
+    ink(round5((10 + jit(1.5)) * s, (22 + jit(2)) * s), C.geranium, p);
+    line(`M0,${-4*s} L0,${-10*s}`, p, .9);
+    add(t0 + i * .07, 1.4, e => p.setAttribute("transform", `rotate(${30 * (1 - e)}) scale(${.15 + .85 * e})`), sine);
+  }
+  const ctr = S("g", {}, h);
+  ink(`M${-4*s},0 a${4*s},${4*s} 0 1 0 ${8*s},0 a${4*s},${4*s} 0 1 0 ${-8*s},0Z`, C.geraniumMid, ctr, 1);
+  for (let i = 0; i < 5; i++) { const a = i * 1.257; S("circle", { cx: Math.cos(a) * 2 * s, cy: Math.sin(a) * 2 * s, r: .8, fill: INK }, ctr); }
+  add(t0 + .5, .6, pop(ctr), back);
+}
+function buttercup(h, s, t0) {
+  const L = S("g", {}, h), R = S("g", {}, h), F = S("g", {}, h);
+  ink(fan(8 * s, 16 * s), C.butter, L); ink(fan(8 * s, 16 * s), C.butter, R); ink(fan(7.5 * s, 14 * s), C.butter, F);
+  line(`M0,-3 L0,${-9*s}`, F, .9);
+  add(t0, 1.2, e => {
+    const sc = .2 + .8 * e;
+    L.setAttribute("transform", `rotate(${-8 - 26 * e}) scale(${sc})`);
+    R.setAttribute("transform", `rotate(${8 + 26 * e}) scale(${sc})`);
+    F.setAttribute("transform", `scale(${sc})`);
+  }, back);
+}
+function blossom(h, s, t0) {
+  for (let i = 0; i < 5; i++) {
+    const g = S("g", { transform: `rotate(${i * 72 + jit(5)})` }, h);
+    const p = S("g", {}, g);
+    ink(round5(6.5 * s, 12 * s), C.blossom, p, 1.4);
+    add(t0 + i * .05, 1.1, e => p.setAttribute("transform", `rotate(${30 * (1 - e)}) scale(${.15 + .85 * e})`), sine);
+  }
+  const c = S("circle", { r: 2.2 * s, fill: C.blossomMid, stroke: INK, "stroke-width": .9 }, h);
+  add(t0 + .5, .5, e => c.setAttribute("r", 2.2 * s * e), eo);
+}
+function calla(h, s, t0) {
+  const g = S("g", {}, h);
+  ink(`M0,0 C${-12*s},${-6*s} ${-18*s},${-26*s} ${-10*s},${-42*s} C${-4*s},${-52*s} ${10*s},${-50*s} ${14*s},${-40*s} C${6*s},${-38*s} ${2*s},${-30*s} ${4*s},${-20*s} C${6*s},${-10*s} ${4*s},${-4*s} 0,0Z`, C.calla, g);
+  ink(`M${4*s},${-20*s} C${2*s},${-30*s} ${6*s},${-38*s} ${14*s},${-40*s} C${16*s},${-28*s} ${10*s},${-10*s} 0,0 C${4*s},${-4*s} ${6*s},${-10*s} ${4*s},${-20*s}Z`, C.callaIn, g);
+  line(`M${-8*s},${-12*s} Q${-11*s},${-24*s} ${-7*s},${-36*s}`, g, .9);
+  add(t0, 1.4, e => g.setAttribute("transform", `rotate(${-12 * (1 - e)}) scale(${.25 + .75 * e})`), back);
+}
+
+/* ---------- the bouquet ---------- */
+function flower(cfg) {
+  const { type, x, y, start: t0 } = cfg;
+  const g = S("g", {}, stemLayer), gh = S("g", {}, headLayer);
+  const fl = { g, gh, amp: cfg.amp || 1, ph: rnd() * 6.28, sp: .55 + rnd() * .3 };
+  flowers.push(fl);
+  const st = makeStem(g, x, y, cfg.w);
+  const grow = cfg.grow || 1.4;
+  add(t0, grow, st.set, eo);
+  const done = t0 + grow;
+  const at = f => t0 + grow * f;   // the moment the stem reaches point f
+
+  if (cfg.leaves) cfg.leaves.forEach(([f, rot, fill, w, l]) => attach(g, st, f, rot, n => leaf(n, fill, w, l), at(f), .8));
+
+  if (type === "sprig") {  // dark leafy sprig
+    for (let f = .4, i = 0; f <= 1.001; f += .085, i++) {
+      const side = i % 2 ? 1 : -1, sz = 1 - (f - .4) * .5;
+      attach(g, st, Math.min(f, 1), side * 48, n => leaf(n, C.leafDark, 7 * sz, 24 * sz), at(f), .6);
+    }
+    return st;
+  }
+  if (type === "fox") {  // foxglove bells
+    for (let f = .5, i = 0; f <= .97; f += .062, i++) {
+      const side = i % 2 ? 1 : -1, sz = 1.6 - (f - .5) * 1.5;
+      attach(g, st, f, side * 60, n => {
+        const b = S("g", { transform: `scale(${side},1) rotate(-60)` }, n);
+        ink(`M0,0 C${5*sz},${1*sz} ${12*sz},${6*sz} ${14*sz},${15*sz} C${15*sz},${20*sz} ${9*sz},${23*sz} ${5*sz},${20*sz} C${2*sz},${23*sz} ${-3*sz},${21*sz} ${-3*sz},${16*sz} C${-4*sz},${9*sz} ${-3*sz},${3*sz} 0,0Z`, C.fox, b, 1.6);
+        line(`M${4*sz},${13*sz} l${1*sz},${3*sz} M${7*sz},${12*sz} l${1*sz},${3*sz}`, b, .9, C.foxMark);
+      }, at(f) + .1, .7);
+    }
+    const tip = pointOn(st, 1);
+    for (let k = 0; k < 3; k++) {
+      const bud = S("ellipse", { cx: tip.x + (k - 1) * 3, cy: tip.y + k * 5, rx: 2.2, ry: 3.4, fill: C.fox, stroke: INK, "stroke-width": 1.1, transform: `rotate(${tip.ang + (k - 1) * 25} ${tip.x + (k - 1) * 3} ${tip.y + k * 5})` }, g);
+      bud.style.opacity = 0;
+      add(done + k * .1, .4, e => bud.style.opacity = e, eo);
+    }
+    return st;
+  }
+  if (type === "berries") {
+    [[.45, -55, 28], [.55, 50, 32], [.68, -48, 26], [.8, 44, 22], [.9, -38, 17]].forEach(([f, a, l], i) => {
+      const end = twig(g, st, f, a, l, at(f), 3 * Math.sign(a));
+      [[0, 0], [-6, 8], [7, 7]].slice(0, i % 2 ? 3 : 2).forEach(([dx, dy], j) => {
+        const b = S("circle", { cx: end.x + dx * .6, cy: end.y + dy * .6, r: 0, fill: C.berry, stroke: INK, "stroke-width": 1.1 }, g);
+        add(at(f) + .45 + j * .08, .5, e => b.setAttribute("r", 4.4 * e), back);
+      });
+    });
+    const tip = pointOn(st, 1);
+    const b = S("circle", { cx: tip.x, cy: tip.y, r: 0, fill: C.berry, stroke: INK, "stroke-width": 1.1 }, g);
+    add(done, .5, e => b.setAttribute("r", 4.8 * e), back);
+    return st;
+  }
+  if (type === "lavender") {
+    for (let f = .5, i = 0; f <= 1.001; f += .05, i++) {
+      [-1, 1].forEach(side => {
+        const sz = 1.4 - (f - .5) * .8;
+        attach(g, st, Math.min(f, 1), side * 32, n => ink(thin(2.6 * sz, 9 * sz), C.lav, n, 1.1), at(f) + .05, .5);
+      });
+    }
+    return st;
+  }
+
+  // flowers with a head at the top of the stem
+  const end = pointOn(st, 1);
+  const tilt = cfg.tilt !== undefined ? cfg.tilt : end.ang * .7;
+  const hg = S("g", { transform: `translate(${x},${y}) rotate(${tilt})` }, gh);
+  const breathe = S("g", {}, hg), appear = S("g", {}, breathe);
+  if (cfg.main) fl.head = breathe;
+  const s = cfg.s || 1;
+  const show = cfg.main ? done - .4 : done - .3;
+  add(show, .8, e => { appear.setAttribute("transform", `scale(${.15 + .85 * e})`); appear.setAttribute("opacity", Math.min(1, e * 1.8)); }, eo);
+  const open = cfg.openAt !== undefined ? cfg.openAt : show + .35;
+  ({ poppy, coneflower, daisy, geranium, buttercup, blossom, calla })[type](appear, s, open, cfg.main);
+
+  // extra little heads on side twigs (geraniums, buttercups, blossoms)
+  (cfg.extra || []).forEach(([f, a, len, es, rot]) => {
+    const tip = twig(g, st, f, a, len, at(f), 4 * Math.sign(a));
+    const eg = S("g", { transform: `translate(${tip.x},${tip.y}) rotate(${rot !== undefined ? rot : tip.ang * .8})` }, gh);
+    const ea = S("g", {}, eg);
+    add(at(f) + .4, .7, e => { ea.setAttribute("transform", `scale(${.15 + .85 * e})`); ea.setAttribute("opacity", Math.min(1, e * 1.8)); }, eo);
+    ({ geranium, buttercup, blossom })[type](ea, es, at(f) + .6);
+  });
+
+  if (cfg.main) {
+    const hit = S("circle", { id: "budHit", cx: x, cy: y - 14, r: 48, fill: "transparent" }, svg);
+    hit.addEventListener("click", start);
+  }
+  return st;
+}
+
+const B = .9, STEP = .28;  // when the rest of the bouquet starts, and the gap between flowers
+flower({ type: "sprig", x: 52, y: 206, start: B, grow: 1.5, w: 1.5, amp: 1.5 });
+flower({ type: "sprig", x: 352, y: 232, start: B + STEP, grow: 1.5, w: 1.5, amp: 1.5 });
+flower({ type: "fox", x: 84, y: 112, start: B + STEP * 2, grow: 1.7, w: 1.7, amp: 1.3 });
+flower({ type: "berries", x: 336, y: 104, start: B + STEP * 3, grow: 1.6, w: 1.4, amp: 1.4 });
+flower({ type: "lavender", x: 58, y: 318, start: B + STEP * 3.5, grow: 1.4, w: 1.3, amp: 1.6 });
+flower({ type: "lavender", x: 344, y: 330, start: B + STEP * 4, grow: 1.4, w: 1.3, amp: 1.6 });
+flower({ type: "geranium", x: 266, y: 136, s: 1.45, start: B + STEP * 1.5, grow: 1.5, tilt: 0,
+  extra: [[.78, 50, 40, 1.15, 0]], leaves: [[.6, -50, C.leafDark, 10, 28]] });
+flower({ type: "calla", x: 140, y: 150, s: 1.45, start: B + STEP * 2.5, grow: 1.5, leaves: [[.6, -46, C.leafPale, 11, 36]] });
+flower({ type: "coneflower", x: 118, y: 262, s: 1.55, start: B + STEP * 4.5, grow: 1.4, leaves: [[.5, -44, C.leafPale, 11, 36]] });
+flower({ type: "daisy", x: 290, y: 270, s: 1.5, start: B + STEP * 5, grow: 1.4, tilt: 0, leaves: [[.5, 46, C.leafPale, 11, 36]] });
+flower({ type: "buttercup", x: 148, y: 360, s: 1.5, start: B + STEP * 6, grow: 1.2, w: 1.6,
+  extra: [[.5, -55, 30, 1.35], [.66, 44, 26, 1.3]] });
+flower({ type: "blossom", x: 252, y: 368, s: 1.55, start: B + STEP * 6.5, grow: 1.2, w: 1.5, tilt: 0,
+  extra: [[.58, 52, 28, 1.3, 0]] });
+// the main one: a pink poppy. negative start = it's drawn before the tap
+flower({ type: "poppy", main: true, x: 200, y: 224, s: 1.75, start: -2.4, grow: 1.5, w: 2, openAt: .1, amp: .8,
+  leaves: [[.58, -42, C.leafPale, 12, 40], [.66, 46, C.leafPale, 11, 36]] });
+
+// twine, wrapped and tied
+const twine = S("g", { fill: "none", stroke: INK, "stroke-width": 1.4, "stroke-linecap": "round" }, svg);
+[`M185,${TIE-6} Q200,${TIE-2} 215,${TIE-6}`, `M185,${TIE} Q200,${TIE+4} 215,${TIE}`, `M186,${TIE+6} Q200,${TIE+10} 214,${TIE+6}`,
+ `M200,${TIE+2} C188,${TIE-14} 172,${TIE-8} 182,${TIE+2} C188,${TIE+7} 196,${TIE+5} 200,${TIE+2}`,
+ `M200,${TIE+2} C214,${TIE-12} 228,${TIE-4} 218,${TIE+4} C212,${TIE+8} 204,${TIE+5} 200,${TIE+2}`,
+ `M199,${TIE+3} C195,${TIE+16} 190,${TIE+26} 184,${TIE+34}`, `M201,${TIE+3} C206,${TIE+14} 212,${TIE+24} 220,${TIE+30}`]
+  .forEach((d, i) => {
+    const p = S("path", { d }, twine);
+    const L = p.getTotalLength(); p.style.strokeDasharray = L + " " + L; p.style.strokeDashoffset = L;
+    add(B + 2.5 + i * .14, .45, e => p.style.strokeDashoffset = L * (1 - e), eo);
+  });
+
+/* ---------- the message ---------- */
+const END = Math.max(...T.map(k => k.s + k.d));
+const msg = document.getElementById("msg");
+msg.setAttribute("aria-label", MESSAGE);
+MESSAGE.split(" ").forEach((word, i, arr) => {
+  const sp = document.createElement("span");
+  sp.className = "w pencil"; sp.textContent = word; sp.setAttribute("aria-hidden", "true");
+  sp.style.transitionDelay = (i * .5) + "s";
+  msg.appendChild(sp);
+  if (i < arr.length - 1) msg.appendChild(document.createTextNode(" "));
+});
+const MSG_AT = END - .6;
+add(MSG_AT, .01, e => { msg.classList.toggle("show", e >= 1); }, t => t);
+add(MSG_AT + 2.4, .01, e => { body.classList.toggle("done", e >= 1); bloomed = e >= 1; }, t => t);
+
+/* ---------- clock ---------- */
+const INTRO = 2.6;
+let phase = "intro", clockT = performance.now(), bloomed = false, budAmp = 1;
+const tLocal = now => {
+  const el = (now - clockT) / 1000 * SPEED;
+  return phase === "intro" ? Math.min(el - INTRO, 0) : el;
+};
+setTimeout(() => body.classList.add("ready"), 1300 / SPEED);
+
+function start() {
+  if (phase !== "intro" || tLocal(performance.now()) < -0.05) return;
+  phase = "bloom"; clockT = performance.now();
+  body.classList.add("blooming");
+}
+document.getElementById("tap").addEventListener("click", start);
+
+document.getElementById("replay").addEventListener("click", () => {
+  body.classList.remove("done"); bloomed = false;
+  msg.classList.remove("show");
+  svg.classList.add("fade");
+  setTimeout(() => {
+    phase = "intro"; clockT = performance.now(); budAmp = 1;
+    svg.classList.remove("fade");
+    setTimeout(() => { phase = "bloom"; clockT = performance.now(); }, (INTRO + .5) * 1000 / SPEED);
+  }, 750);
+});
+
+/* ---------- distance line ---------- */
+function updateMeta() {
+  document.getElementById("meta").innerHTML =
+    `<span>from ${MILES} miles away!</span><br><span>(that's ${KM} km btw)</span>`;
+}
+updateMeta();
+
+/* ---------- paper grain ---------- */
+function noise(size, fn) {
+  const c = document.createElement("canvas"); c.width = c.height = size;
+  const x = c.getContext("2d"), d = x.createImageData(size, size);
+  for (let i = 0; i < d.data.length; i += 4) fn(d.data, i);
+  x.putImageData(d, 0, 0);
+  return c.toDataURL();
+}
+document.getElementById("grain").style.backgroundImage = `url(${noise(140, (a, i) => { const v = Math.random() * 255; a[i] = a[i+1] = a[i+2] = v; a[i+3] = Math.random() * 14; })})`;
+
+/* ---------- tap the bouquet after it's done: a petal falls ---------- */
+const fx = document.getElementById("fx"), cx = fx.getContext("2d");
+let W = 0, H = 0;
+function size() {
+  const dpr = Math.min(2, devicePixelRatio || 1);
+  W = innerWidth; H = innerHeight;
+  fx.width = W * dpr; fx.height = H * dpr;
+  cx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+size(); addEventListener("resize", size);
+const falling = [];
+const FALL = [C.poppy[1], C.cone, C.daisy, C.geranium, C.butter, C.blossom];
+svg.addEventListener("pointerdown", e => {
+  if (!bloomed || reduce || falling.length > 12) return;
+  falling.push({ x: e.clientX, y: e.clientY, vx: (Math.random() - .5) * 20, vy: 22 + Math.random() * 14, rot: Math.random() * 6, vr: (Math.random() - .5) * 1.6, born: performance.now(), life: 4500, c: FALL[Math.floor(Math.random() * FALL.length)] });
+});
+function drawFx(now, dt) {
+  cx.clearRect(0, 0, W, H);
+  const t = now / 1000;
+  for (let i = falling.length - 1; i >= 0; i--) {
+    const f = falling[i], k = (now - f.born) / f.life;
+    if (k > 1) { falling.splice(i, 1); continue; }
+    f.y += f.vy * dt; f.x += (f.vx + Math.sin(t * 1.8 + f.rot) * 22) * dt; f.rot += f.vr * dt;
+    cx.save(); cx.globalAlpha = Math.min(1, k * 8) * (1 - k * k);
+    cx.translate(f.x, f.y); cx.rotate(f.rot); cx.scale(1, .5 + .5 * Math.abs(Math.sin(t * 2 + f.rot)));
+    cx.beginPath(); cx.moveTo(0, -9); cx.bezierCurveTo(8, -7, 7, 6, 0, 9); cx.bezierCurveTo(-7, 6, -8, -7, 0, -9);
+    cx.fillStyle = f.c; cx.fill(); cx.lineWidth = 1.4; cx.strokeStyle = INK; cx.stroke();
+    cx.restore();
+  }
+}
+
+/* ---------- main loop ---------- */
+let prev = performance.now();
+function frame(now) {
+  const dt = Math.min(.05, (now - prev) / 1000); prev = now;
+  const t = tLocal(now);
+  for (const k of T) {
+    let p = (t - k.s) / k.d; p = p < 0 ? 0 : p > 1 ? 1 : p;
+    if (p !== k.last) { k.last = p; k.f(k.e(p)); }
+  }
+  const time = now / 1000;
+  budAmp += ((phase === "intro" ? 1 : 0) - budAmp) * Math.min(1, dt * 2);
+  for (const fl of flowers) {
+    if (!reduce) { const tr = `rotate(${Math.sin(time * fl.sp + fl.ph) * fl.amp} ${OX} ${OY})`; fl.g.setAttribute("transform", tr); fl.gh.setAttribute("transform", tr); }
+    if (fl.head) fl.head.setAttribute("transform", `scale(${1 + .04 * budAmp * Math.sin(time * 1.9)})`);
+  }
+  drawFx(now, dt);
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
